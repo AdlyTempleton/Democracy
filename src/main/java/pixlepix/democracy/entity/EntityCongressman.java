@@ -33,9 +33,9 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
         this.type = type;
     }
 
-
     public EntityCongressman(World world) {
         super(world);
+        type = EnumStage.HOUSE;
         Random r = new Random();
         for (int i = 0; i < r.nextInt(3) + 1; i++) {
             Ammendment amend = Ammendment.potentialAmendments.get(r.nextInt(Ammendment.potentialAmendments.size()));
@@ -49,6 +49,11 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
                 hatedAmendments.add(amend);
             }
         }
+    }
+
+    @Override
+    protected boolean isMovementBlocked() {
+        return true;
     }
 
     @Override
@@ -96,10 +101,11 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
         }
     }
 
+
     @Override
     public void readSpawnData(ByteBuf data) {
         isSpeaker = data.readBoolean();
-        type = EnumStage.values()[data.readByte()];
+        type = EnumStage.values()[data.readInt()];
 
         int desiredSize = data.readByte();
         desiredAmendments = new ArrayList<Ammendment>();

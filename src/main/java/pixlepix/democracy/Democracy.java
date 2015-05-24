@@ -6,7 +6,6 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.EntityRegistry;
-import net.minecraftforge.common.MinecraftForge;
 import pixlepix.democracy.data.Ammendment;
 import pixlepix.democracy.data.BillData;
 import pixlepix.democracy.entity.EntityCongressman;
@@ -37,7 +36,10 @@ import pixlepix.democracy.entity.EntityCongressman;
         BillData.init();
         Ammendment.init();
 
-        EntityRegistry.registerModEntity(EntityCongressman.class, "Congressman", 0 , this, 80, 1, true);
+        EntityRegistry.registerGlobalEntityID(EntityCongressman.class, "Congressman", 0, 20, 0xFF0033);
+
+
+        EntityRegistry.registerModEntity(EntityCongressman.class, "Congressman", 0, this, 80, 1, true);
     }
 
     @Mod.EventHandler
