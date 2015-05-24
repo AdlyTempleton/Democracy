@@ -3,7 +3,6 @@ package pixlepix.democracy.entity;
 import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -25,6 +24,32 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
 
     public ArrayList<Ammendment> desiredAmendments = new ArrayList<Ammendment>();
     public ArrayList<Ammendment> hatedAmendments = new ArrayList<Ammendment>();
+    public EnumStage type;
+    public boolean isSpeaker = false;
+
+    public EntityCongressman(World world, EnumStage type) {
+
+        this(world);
+        this.type = type;
+    }
+
+
+    public EntityCongressman(World world) {
+        super(world);
+        Random r = new Random();
+        for (int i = 0; i < r.nextInt(3) + 1; i++) {
+            Ammendment amend = Ammendment.potentialAmendments.get(r.nextInt(Ammendment.potentialAmendments.size()));
+            if (!desiredAmendments.contains(amend)) {
+                desiredAmendments.add(amend);
+            }
+        }
+        for (int i = 0; i < r.nextInt(2); i++) {
+            Ammendment amend = Ammendment.potentialAmendments.get(r.nextInt(Ammendment.potentialAmendments.size()));
+            if (!desiredAmendments.contains(amend) && !hatedAmendments.contains(amend)) {
+                hatedAmendments.add(amend);
+            }
+        }
+    }
 
     @Override
     public void writeEntityToNBT(NBTTagCompound nbt) {
@@ -41,7 +66,7 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
     public void readCustomNBT(NBTTagCompound nbt) {
         isSpeaker = nbt.getBoolean("isSpeaker");
         type = EnumStage.values()[nbt.getInteger("type")];
-        
+
         int[] desiredArray = nbt.getIntArray("desiredAmendments");
         desiredAmendments = new ArrayList<Ammendment>();
         for(int i : desiredArray){
@@ -55,12 +80,11 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
         }
     }
 
-
     @Override
     public void writeSpawnData(ByteBuf data) {
         data.writeBoolean(isSpeaker);
         data.writeInt(type.ordinal());
-        
+
         data.writeByte(desiredAmendments.size());
         for(Ammendment ammendment: desiredAmendments){
             data.writeByte(ammendment.id);
@@ -76,7 +100,7 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
     public void readSpawnData(ByteBuf data) {
         isSpeaker = data.readBoolean();
         type = EnumStage.values()[data.readByte()];
-        
+
         int desiredSize = data.readByte();
         desiredAmendments = new ArrayList<Ammendment>();
         for(int i = 0; i < desiredSize; i++){
@@ -93,30 +117,18 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
     public void writeCustomNBT(NBTTagCompound nbt){
         nbt.setBoolean("isSpeaker", isSpeaker);
         nbt.setInteger("type", type.ordinal());
-        
+
         int[] desiredArray = new int[desiredAmendments.size()];
         for(int i = 0; i < desiredArray.length; i++){
             desiredArray[i] = desiredAmendments.get(i).id;
         }
         nbt.setIntArray("desiredAmendments", desiredArray);
-        
+
         int[] hatedArray = new int[hatedAmendments.size()];
         for(int i = 0; i < hatedArray.length; i++){
             hatedArray[i] = hatedAmendments.get(i).id;
         }
         nbt.setIntArray("hatedAmendments", hatedArray);
-    }
-    
-    
-
-    public EnumStage type;
-    
-    public boolean isSpeaker = false;
-    
-    public EntityCongressman(World world, EnumStage type) {
-
-        this(world);
-        this.type = type;
     }
 
     @Override
@@ -139,26 +151,9 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
             if(item == Items.redstone){
                 type = EnumStage.PRESIDENT;
             }
-            
+
         }
         return false;
-    }
-
-    public EntityCongressman(World world) {
-        super(world);
-        Random r = new Random();
-        for(int i=0; i < r.nextInt(3) + 1; i++){
-            Ammendment amend = Ammendment.potentialAmendments.get(r.nextInt(Ammendment.potentialAmendments.size()));
-            if(!desiredAmendments.contains(amend)){
-                desiredAmendments.add(amend);
-            }
-        }
-        for(int i=0; i < r.nextInt(2); i++){
-            Ammendment amend = Ammendment.potentialAmendments.get(r.nextInt(Ammendment.potentialAmendments.size()));
-            if(!desiredAmendments.contains(amend) && !hatedAmendments.contains(amend)){
-                hatedAmendments.add(amend);
-            }
-        }
     }
 
     @Override
@@ -208,6 +203,14 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
     @Override
     public void onLivingUpdate() {
         super.onLivingUpdate();
+        if (worldObj.isRemote) {
+            if (isVotingYes()) {
+                worldObj.spawnParticle("heart", posX, posY + 2, posZ, 0, 0, 0);
+            } else {
+                worldObj.spawnParticle("reddust", posX, posY + 2, posZ, 0, 0, 0);
+
+            }
+        }
     }
 
     @Override
