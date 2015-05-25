@@ -27,7 +27,7 @@ public class ItemAmmendment extends Item {
 
     @Override
     public void registerIcons(IIconRegister reg) {
-        iIcon = reg.registerIcon("book");
+        iIcon = reg.registerIcon("book_normal");
     }
 
     @Override
