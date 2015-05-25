@@ -8,12 +8,10 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.DamageSource;
-import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeChunkManager;
-import pixlepix.democracy.Democracy;
 import pixlepix.democracy.ItemAmmendment;
 import pixlepix.democracy.data.Ammendment;
 import pixlepix.democracy.data.BillData;
@@ -41,6 +39,7 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
 
     public EntityCongressman(World world) {
         super(world);
+
         type = EnumStage.HOUSE;
         Random r = new Random();
         for (int i = 0; i < r.nextInt(3) + 1; i++) {
@@ -55,6 +54,11 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
                 hatedAmendments.add(amend);
             }
         }
+    }
+
+    @Override
+    public boolean isNoDespawnRequired() {
+        return true;
     }
 
     @Override
@@ -142,6 +146,7 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
         nbt.setIntArray("hatedAmendments", hatedArray);
     }
 
+
     @Override
     protected boolean interact(EntityPlayer player) {
         ItemStack stack = player.inventory.getCurrentItem();
@@ -168,16 +173,91 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
                 if (isSpeaker && item instanceof ItemAmmendment) {
                     Ammendment ammendment = Ammendment.potentialAmendments.get(stack.getItemDamage());
                     if (!BillData.bill.amendments.contains(ammendment)) {
-                        BillData.bill.amendments.add(ammendment);
                         if (!worldObj.isRemote) {
+
+                            BillData.bill.amendments.add(ammendment);
                             player.addChatComponentMessage(new ChatComponentText(ammendment.name + " was added to the bill successfully"));
                         }
                     }
                 }
 
             }
+        } else if (isSpeaker && (BillData.bill.stage == this.type || ((BillData.bill.stage == EnumStage.HOUSEPOSTVETO) && type == EnumStage.HOUSE) || (BillData.bill.stage == EnumStage.SENATEPOSTVETO && type == EnumStage.SENATE))) {
+            AxisAlignedBB axisAlignedBB = this.boundingBox.copy().expand(100, 100, 100);
+            ArrayList<EntityCongressman> allCongressmen = (ArrayList<EntityCongressman>) worldObj.getEntitiesWithinAABBExcludingEntity(this, axisAlignedBB, new CongressmanSelector(type));
+            if (type != EnumStage.PRESIDENT) {
+                int yea = 0;
+                int nay = 0;
+                for (EntityCongressman congressman : allCongressmen) {
+                    if (congressman.isVotingYes()) {
+                        yea += 1;
+                    } else {
+                        nay += 1;
+                    }
+                }
+                if (!worldObj.isRemote) {
+                    player.addChatComponentMessage(new ChatComponentText("Yea: " + yea));
+                    player.addChatComponentMessage(new ChatComponentText("Nay: " + nay));
+                }
+                boolean successful = yea > nay;
+                if (type == EnumStage.HOUSEPOSTVETO || type == EnumStage.SENATEPOSTVETO) {
+                    int total = yea + nay;
+                    successful = yea > (.75 * total);
+                }
+                if (successful) {
+
+                    if (!worldObj.isRemote) {
+                        player.addChatComponentMessage(new ChatComponentText("The bill passes!"));
+                    }
+                    if (type == EnumStage.SENATEPOSTVETO) {
+
+                        if (!worldObj.isRemote) {
+                            player.addChatComponentMessage(new ChatComponentText("The veto is overridden and the bill becomes law!"));
+
+                            player.addChatComponentMessage(new ChatComponentText("You win!"));
+                        }
+                    } else {
+                        EnumStage nextStage = EnumStage.COMMITTEE;
+                        switch (type) {
+                            case COMMITTEE:
+                                nextStage = EnumStage.HOUSE;
+                                break;
+                            case HOUSEPOSTVETO:
+                                nextStage = EnumStage.SENATEPOSTVETO;
+                                break;
+                            case HOUSE:
+                                nextStage = EnumStage.SENATE;
+                                break;
+                            case SENATE:
+                                nextStage = EnumStage.PRESIDENT;
+                                break;
+                        }
+
+                        if (!worldObj.isRemote) {
+                            player.addChatComponentMessage(new ChatComponentText("The bill moves on to the " + nextStage.name));
+
+                            BillData.bill.stage = nextStage;
+                        }
+                    }
+                }
+            } else {
+                if (isVotingYes()) {
+
+                    if (!worldObj.isRemote) {
+                        player.addChatComponentMessage(new ChatComponentText("The president signs the bill. You win!"));
+                    }
+                } else {
+                    if (!worldObj.isRemote) {
+                        player.addChatComponentMessage(new ChatComponentText("The bill is vetoed. It moves back into the house"));
+
+                        BillData.bill.stage = EnumStage.HOUSEPOSTVETO;
+                    }
+                }
+            }
+
+
         }
-        return false;
+        return true;
     }
 
     @Override
@@ -227,7 +307,6 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
     @Override
     public void onLivingUpdate() {
         super.onLivingUpdate();
-        ForgeChunkManager.forceChunk(Democracy.getTicketForWorld(worldObj), new ChunkCoordIntPair((int) posX / 16, (int) posZ / 16));
         if (worldObj.isRemote) {
             if (isVotingYes()) {
                 timer++;

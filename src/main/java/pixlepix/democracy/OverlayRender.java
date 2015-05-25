@@ -13,59 +13,17 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import org.lwjgl.opengl.GL11;
 import pixlepix.democracy.data.Ammendment;
+import pixlepix.democracy.data.EnumStage;
 import pixlepix.democracy.entity.EntityCongressman;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by localmacaccount on 5/24/15.
  * Borrowed from Auracascade 
  */
 public class OverlayRender {
-    @SubscribeEvent
-    public void onScreenRenderEvent(RenderGameOverlayEvent event) {
-        if (event.type == RenderGameOverlayEvent.ElementType.TEXT) {
-            World world = Democracy.proxy.getWorld();
-            EntityPlayer player = Democracy.proxy.getPlayer();
-            Vec3 vec3 = player.getPosition(1.0F);
-            Vec3 vec3a = player.getLook(1.0F);
-            Vec3 vec3b = vec3.addVector(vec3a.xCoord * 3, vec3a.yCoord * 3, vec3a.zCoord * 3);
-            MovingObjectPosition movingobjectposition = Minecraft.getMinecraft().objectMouseOver;
-            if (movingobjectposition != null && movingobjectposition.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
-                
-                ScaledResolution resolution = new ScaledResolution(Minecraft.getMinecraft(), Minecraft.getMinecraft().displayWidth, Minecraft.getMinecraft().displayHeight);
-                int centerX = (resolution.getScaledWidth() - Minecraft.getMinecraft().fontRenderer.getStringWidth("hi")) / 2;
-
-                int centerY = (resolution.getScaledHeight() - Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT) / 2;
-                Entity entity = movingobjectposition.entityHit;
-                if(entity instanceof EntityCongressman) {
-                    EntityCongressman congressman = (EntityCongressman) entity;
-                    List<String> result = new ArrayList<String>();
-                    
-                    
-                    result.add("Profession: "+ congressman.type.memberName);
-
-
-                    if(congressman.isSpeaker) {
-                        result.add("Leader - Start vote or add ammendments");
-                    }else {
-                        for (Ammendment ammendment : congressman.desiredAmendments) {
-                            result.add("Wants: " + ammendment.name);
-                        }
-
-                        for (Ammendment ammendment : congressman.hatedAmendments) {
-                            result.add("Doesn't want: " + ammendment.name);
-                        }
-
-                        result.add("Total opinion: " + congressman.getOpinion());
-                    }
-                    renderTooltip(centerX, centerY, result, 0x5577ff, 0x505000ff);
-                }
-
-            }
-        }
-    }
-    
     //Borrowed from VazkiiRenderHelper in Botania
     public static void renderTooltip(int x, int y, List<String> tooltipData, int color, int color2) {
         boolean lighting = GL11.glGetBoolean(GL11.GL_LIGHTING);
@@ -113,7 +71,7 @@ public class OverlayRender {
             net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
         GL11.glColor4f(1F, 1F, 1F, 1F);
     }
-
+    
     public static void drawGradientRect(int par1, int par2, float z, int par3, int par4, int par5, int par6) {
         float var7 = (par5 >> 24 & 255) / 255F;
         float var8 = (par5 >> 16 & 255) / 255F;
@@ -141,5 +99,50 @@ public class OverlayRender {
         GL11.glDisable(GL11.GL_BLEND);
         GL11.glEnable(GL11.GL_ALPHA_TEST);
         GL11.glEnable(GL11.GL_TEXTURE_2D);
+    }
+
+    @SubscribeEvent
+    public void onScreenRenderEvent(RenderGameOverlayEvent event) {
+        if (event.type == RenderGameOverlayEvent.ElementType.TEXT) {
+            World world = Democracy.proxy.getWorld();
+            EntityPlayer player = Democracy.proxy.getPlayer();
+            Vec3 vec3 = player.getPosition(1.0F);
+            Vec3 vec3a = player.getLook(1.0F);
+            Vec3 vec3b = vec3.addVector(vec3a.xCoord * 3, vec3a.yCoord * 3, vec3a.zCoord * 3);
+            MovingObjectPosition movingobjectposition = Minecraft.getMinecraft().objectMouseOver;
+            if (movingobjectposition != null && movingobjectposition.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
+
+                ScaledResolution resolution = new ScaledResolution(Minecraft.getMinecraft(), Minecraft.getMinecraft().displayWidth, Minecraft.getMinecraft().displayHeight);
+                int centerX = (resolution.getScaledWidth() - Minecraft.getMinecraft().fontRenderer.getStringWidth("hi")) / 2;
+
+                int centerY = (resolution.getScaledHeight() - Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT) / 2;
+                Entity entity = movingobjectposition.entityHit;
+                if (entity instanceof EntityCongressman) {
+                    EntityCongressman congressman = (EntityCongressman) entity;
+                    List<String> result = new ArrayList<String>();
+
+
+                    result.add("Profession: " + congressman.type.memberName);
+
+
+                    if (congressman.isSpeaker) {
+                        result.add("Leader - Start vote or add ammendments");
+                    }
+                    if (!congressman.isSpeaker || congressman.type == EnumStage.PRESIDENT) {
+                        for (Ammendment ammendment : congressman.desiredAmendments) {
+                            result.add("Wants: " + ammendment.name);
+                        }
+
+                        for (Ammendment ammendment : congressman.hatedAmendments) {
+                            result.add("Doesn't want: " + ammendment.name);
+                        }
+
+                        result.add("Total opinion: " + congressman.getOpinion());
+                    }
+                    renderTooltip(centerX, centerY, result, 0x5577ff, 0x505000ff);
+                }
+
+            }
+        }
     }
 }
