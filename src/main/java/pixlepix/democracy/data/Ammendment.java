@@ -1,6 +1,5 @@
 package pixlepix.democracy.data;
 
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 
 import java.util.ArrayList;
@@ -10,22 +9,24 @@ import java.util.ArrayList;
  */
 public class Ammendment {
     public static ArrayList<Ammendment> potentialAmendments = new ArrayList<Ammendment>();
-    
-    public Ammendment(String s, ItemStack displayStack){
+    public static int nextId = 0;
+    public String name;
+    public ItemStack displayStack;
+    public int id;
+
+    public Ammendment(String s) {
 
         name = s;
-        this.displayStack = displayStack;
         potentialAmendments.add(this);
         id = nextId;
         nextId++;
     }
-    
-    public String name;
-    public ItemStack displayStack;
-    public static int nextId = 0;
-    public int id;
+
     public static void init(){
-        new Ammendment("Cookies", new ItemStack(Items.cookie));
-        new Ammendment("Spooky Skeletons", new ItemStack(Items.bone));
+        new Ammendment("Cookies");
+        new Ammendment("Ice cream");
+        new Ammendment("Root beer");
+        new Ammendment("Pizza");
+        new Ammendment("Brownies");
     }
 }

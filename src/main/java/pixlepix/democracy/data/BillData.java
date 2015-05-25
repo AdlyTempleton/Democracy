@@ -15,7 +15,7 @@ public class BillData {
     public ArrayList<EntityCongressman> porkBarrelCongressmen = new ArrayList<EntityCongressman>();
     
     public EnumStage stage = EnumStage.COMMITTEE;
-    
+
     public static void init(){
         bill = new BillData();
     }

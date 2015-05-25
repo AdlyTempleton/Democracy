@@ -8,8 +8,13 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.DamageSource;
+import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeChunkManager;
+import pixlepix.democracy.Democracy;
+import pixlepix.democracy.ItemAmmendment;
 import pixlepix.democracy.data.Ammendment;
 import pixlepix.democracy.data.BillData;
 import pixlepix.democracy.data.EnumStage;
@@ -26,6 +31,7 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
     public ArrayList<Ammendment> hatedAmendments = new ArrayList<Ammendment>();
     public EnumStage type;
     public boolean isSpeaker = false;
+    private int timer = 0;
 
     public EntityCongressman(World world, EnumStage type) {
 
@@ -101,7 +107,6 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
         }
     }
 
-
     @Override
     public void readSpawnData(ByteBuf data) {
         isSpeaker = data.readBoolean();
@@ -140,24 +145,37 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
     @Override
     protected boolean interact(EntityPlayer player) {
         ItemStack stack = player.inventory.getCurrentItem();
-        if(stack != null && player.capabilities.isCreativeMode){
+        if (stack != null) {
             Item item = stack.getItem();
-            if(item == Items.diamond){
-                isSpeaker = !isSpeaker;
-            }
-            if(item == Items.ender_pearl){
-                type = EnumStage.COMMITTEE;
-            }
-            if(item == Items.blaze_rod){
-                type = EnumStage.HOUSE;
-            }
-            if(item == Items.spider_eye){
-                type = EnumStage.SENATE;
-            }
-            if(item == Items.redstone){
-                type = EnumStage.PRESIDENT;
-            }
+            if (player.capabilities.isCreativeMode) {
+                if (item == Items.diamond) {
+                    isSpeaker = !isSpeaker;
+                }
+                if (item == Items.ender_pearl) {
+                    type = EnumStage.COMMITTEE;
+                }
+                if (item == Items.blaze_rod) {
+                    type = EnumStage.HOUSE;
+                }
+                if (item == Items.spider_eye) {
+                    type = EnumStage.SENATE;
+                }
+                if (item == Items.redstone) {
+                    type = EnumStage.PRESIDENT;
+                }
 
+            } else {
+                if (isSpeaker && item instanceof ItemAmmendment) {
+                    Ammendment ammendment = Ammendment.potentialAmendments.get(stack.getItemDamage());
+                    if (!BillData.bill.amendments.contains(ammendment)) {
+                        BillData.bill.amendments.add(ammendment);
+                        if (!worldObj.isRemote) {
+                            player.addChatComponentMessage(new ChatComponentText(ammendment.name + " was added to the bill successfully"));
+                        }
+                    }
+                }
+
+            }
         }
         return false;
     }
@@ -186,11 +204,11 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
         }
         return points;
     }
-    
+
     public boolean isVotingYes(){
-         return  getOpinion() >= 0;
+        return getOpinion() >= 0;
     }
-    
+
     @Override
     public ItemStack getHeldItem() {
         return isVotingYes() ? new ItemStack(Items.emerald) : new ItemStack(Items.redstone);
@@ -209,9 +227,14 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
     @Override
     public void onLivingUpdate() {
         super.onLivingUpdate();
+        ForgeChunkManager.forceChunk(Democracy.getTicketForWorld(worldObj), new ChunkCoordIntPair((int) posX / 16, (int) posZ / 16));
         if (worldObj.isRemote) {
             if (isVotingYes()) {
-                worldObj.spawnParticle("heart", posX, posY + 2, posZ, 0, 0, 0);
+                timer++;
+                if (timer >= 5) {
+                    timer = 0;
+                    worldObj.spawnParticle("heart", posX, posY + 2, posZ, 0, 0, 0);
+                }
             } else {
                 worldObj.spawnParticle("reddust", posX, posY + 2, posZ, 0, 0, 0);
 
