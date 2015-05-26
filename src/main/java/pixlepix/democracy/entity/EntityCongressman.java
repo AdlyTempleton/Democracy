@@ -84,13 +84,13 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
 
         int[] desiredArray = nbt.getIntArray("desiredAmendments");
         desiredAmendments = new ArrayList<Ammendment>();
-        for(int i : desiredArray){
+        for (int i : desiredArray) {
             desiredAmendments.add(Ammendment.potentialAmendments.get(i));
         }
 
         int[] hatedArray = nbt.getIntArray("hatedAmendments");
         hatedAmendments = new ArrayList<Ammendment>();
-        for(int i : hatedArray){
+        for (int i : hatedArray) {
             hatedAmendments.add(Ammendment.potentialAmendments.get(i));
         }
     }
@@ -101,12 +101,12 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
         data.writeInt(type.ordinal());
 
         data.writeByte(desiredAmendments.size());
-        for(Ammendment ammendment: desiredAmendments){
+        for (Ammendment ammendment : desiredAmendments) {
             data.writeByte(ammendment.id);
         }
 
         data.writeByte(hatedAmendments.size());
-        for(Ammendment ammendment: hatedAmendments){
+        for (Ammendment ammendment : hatedAmendments) {
             data.writeByte(ammendment.id);
         }
     }
@@ -118,29 +118,29 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
 
         int desiredSize = data.readByte();
         desiredAmendments = new ArrayList<Ammendment>();
-        for(int i = 0; i < desiredSize; i++){
+        for (int i = 0; i < desiredSize; i++) {
             desiredAmendments.add(Ammendment.potentialAmendments.get(data.readByte()));
         }
 
         int hatedSize = data.readByte();
         hatedAmendments = new ArrayList<Ammendment>();
-        for(int i = 0; i < hatedSize; i++){
+        for (int i = 0; i < hatedSize; i++) {
             hatedAmendments.add(Ammendment.potentialAmendments.get(data.readByte()));
         }
     }
 
-    public void writeCustomNBT(NBTTagCompound nbt){
+    public void writeCustomNBT(NBTTagCompound nbt) {
         nbt.setBoolean("isSpeaker", isSpeaker);
         nbt.setInteger("type", type.ordinal());
 
         int[] desiredArray = new int[desiredAmendments.size()];
-        for(int i = 0; i < desiredArray.length; i++){
+        for (int i = 0; i < desiredArray.length; i++) {
             desiredArray[i] = desiredAmendments.get(i).id;
         }
         nbt.setIntArray("desiredAmendments", desiredArray);
 
         int[] hatedArray = new int[hatedAmendments.size()];
-        for(int i = 0; i < hatedArray.length; i++){
+        for (int i = 0; i < hatedArray.length; i++) {
             hatedArray[i] = hatedAmendments.get(i).id;
         }
         nbt.setIntArray("hatedAmendments", hatedArray);
@@ -265,29 +265,41 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
         return;
     }
 
-    public int getOpinion(){
+    public int getOpinion() {
         BillData bill = BillData.bill;
         int points = -5;
-        for(Ammendment ammendment : desiredAmendments){
-            if(bill.amendments.contains(ammendment)){
+        for (Ammendment ammendment : desiredAmendments) {
+            if (bill.amendments.contains(ammendment)) {
                 points += 10;
             }
         }
 
-        for(Ammendment ammendment : hatedAmendments){
-            if(bill.amendments.contains(ammendment)){
+        for (Ammendment ammendment : hatedAmendments) {
+            if (bill.amendments.contains(ammendment)) {
                 points -= 10;
             }
         }
-        if(bill.porkBarrelCongressmen.contains(this)){
+        if (bill.porkBarrelCongressmen.contains(this)) {
             points += 20;
         }
         return points;
     }
 
-    public boolean isVotingYes(){
-        return getOpinion() >= 0;
+    public boolean isVotingYes() {
+        return (getPeerPressure() + getOpinion()) >= 0;
     }
+
+    public int getPeerPressure() {
+
+        AxisAlignedBB axisAlignedBB = this.boundingBox.copy().expand(8, 8, 8);
+        ArrayList<EntityCongressman> allCongressmen = (ArrayList<EntityCongressman>) worldObj.getEntitiesWithinAABBExcludingEntity(this, axisAlignedBB, new CongressmanSelector(type));
+        double pressure = 0;
+        for (EntityCongressman entityCongressman : allCongressmen) {
+            pressure += entityCongressman.getOpinion() / 4;
+        }
+        return (int) pressure;
+    }
+
 
     @Override
     public ItemStack getHeldItem() {

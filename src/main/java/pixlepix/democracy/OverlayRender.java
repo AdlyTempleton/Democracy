@@ -136,10 +136,10 @@ public class OverlayRender {
                         for (Ammendment ammendment : congressman.hatedAmendments) {
                             result.add("Doesn't want: " + ammendment.name);
                         }
-
-                        result.add("Total opinion: " + congressman.getOpinion());
+                        result.add("Peer Pressure: " + congressman.getPeerPressure());
+                        result.add("Total opinion: " + (congressman.getOpinion() + congressman.getPeerPressure()));
                     }
-                    renderTooltip(centerX, centerY, result, 0x5577ff, 0x505000ff);
+                    renderTooltip(centerX, centerY, result, 0x5577ff, 0x550000ff);
                 }
 
             }
