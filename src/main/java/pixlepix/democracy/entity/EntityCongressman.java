@@ -48,10 +48,25 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
                 desiredAmendments.add(amend);
             }
         }
+
+        if (r.nextBoolean() && Ammendment.getPreferredBy(type).size() > 0) {
+            Ammendment prop = Ammendment.getPreferredBy(type).get(r.nextInt(Ammendment.getPreferredBy(type).size()));
+            if (!desiredAmendments.contains(prop)) {
+                desiredAmendments.add(prop);
+            }
+        }
+        
         for (int i = 0; i < r.nextInt(2); i++) {
             Ammendment amend = Ammendment.potentialAmendments.get(r.nextInt(Ammendment.potentialAmendments.size()));
             if (!desiredAmendments.contains(amend) && !hatedAmendments.contains(amend)) {
                 hatedAmendments.add(amend);
+            }
+        }
+
+        if (r.nextBoolean() && Ammendment.getHatedBy(type).size() > 0) {
+            Ammendment prop = Ammendment.getHatedBy(type).get(r.nextInt(Ammendment.getHatedBy(type).size()));
+            if (!desiredAmendments.contains(prop) && !hatedAmendments.contains(prop)) {
+                hatedAmendments.add(prop);
             }
         }
     }

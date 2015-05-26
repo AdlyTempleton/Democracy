@@ -2,6 +2,7 @@ package pixlepix.democracy;
 
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
@@ -41,6 +42,14 @@ public class ItemAmmendment extends Item {
         return true;
     }
 
+    @Override
+    public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean b) {
+        super.addInformation(stack, player, list, b);
+        Ammendment ammendment = Ammendment.potentialAmendments.get(stack.getItemDamage());
+        if (ammendment.stage != null) {
+            list.add("Popular in: " + ammendment.stage.name);
+        }
+    }
 
     @Override
     public void getSubItems(Item item, CreativeTabs tabs, List l) {
