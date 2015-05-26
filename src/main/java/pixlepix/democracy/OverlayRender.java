@@ -13,6 +13,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import org.lwjgl.opengl.GL11;
 import pixlepix.democracy.data.Ammendment;
+import pixlepix.democracy.data.BillData;
 import pixlepix.democracy.data.EnumStage;
 import pixlepix.democracy.entity.EntityCongressman;
 
@@ -106,16 +107,38 @@ public class OverlayRender {
         if (event.type == RenderGameOverlayEvent.ElementType.TEXT) {
             World world = Democracy.proxy.getWorld();
             EntityPlayer player = Democracy.proxy.getPlayer();
+
+
+            //Global overlay
+            ScaledResolution resolution = new ScaledResolution(Minecraft.getMinecraft(), Minecraft.getMinecraft().displayWidth, Minecraft.getMinecraft().displayHeight);
+
+
+            int topX = (resolution.getScaledWidth() - Minecraft.getMinecraft().fontRenderer.getStringWidth("hi"));
+
+            int topY = (resolution.getScaledHeight() - Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT);
+
+            int centerX = (resolution.getScaledWidth() - Minecraft.getMinecraft().fontRenderer.getStringWidth("hi")) / 2;
+
+            int centerY = (resolution.getScaledHeight() - Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT) / 2;
+
+
+            ArrayList<String> global = new ArrayList<String>();
+
+            global.add("Bill: Free food in school");
+            global.add("Stage: " + BillData.bill.stage);
+            global.add("Ammendments: ");
+            for (Ammendment ammendment : BillData.bill.amendments) {
+                global.add(ammendment.name);
+            }
+
+            renderTooltip((int) (resolution.getScaledWidth() * .5) - (Minecraft.getMinecraft().fontRenderer.getStringWidth(global.get(0)) / 2), Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT * (3 + BillData.bill.amendments.size()), global, 0x5577ff, 0x550000ff);
+            
             Vec3 vec3 = player.getPosition(1.0F);
             Vec3 vec3a = player.getLook(1.0F);
             Vec3 vec3b = vec3.addVector(vec3a.xCoord * 3, vec3a.yCoord * 3, vec3a.zCoord * 3);
             MovingObjectPosition movingobjectposition = Minecraft.getMinecraft().objectMouseOver;
             if (movingobjectposition != null && movingobjectposition.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
 
-                ScaledResolution resolution = new ScaledResolution(Minecraft.getMinecraft(), Minecraft.getMinecraft().displayWidth, Minecraft.getMinecraft().displayHeight);
-                int centerX = (resolution.getScaledWidth() - Minecraft.getMinecraft().fontRenderer.getStringWidth("hi")) / 2;
-
-                int centerY = (resolution.getScaledHeight() - Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT) / 2;
                 Entity entity = movingobjectposition.entityHit;
                 if (entity instanceof EntityCongressman) {
                     EntityCongressman congressman = (EntityCongressman) entity;
