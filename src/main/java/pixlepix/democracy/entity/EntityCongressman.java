@@ -185,7 +185,7 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
                 }
 
             } else {
-                if (isSpeaker && item instanceof ItemAmmendment) {
+                if (isSpeaker && item instanceof ItemAmmendment && type.canAmmend) {
                     Ammendment ammendment = Ammendment.potentialAmendments.get(stack.getItemDamage());
                     if (!BillData.bill.amendments.contains(ammendment)) {
                         if (!worldObj.isRemote) {
