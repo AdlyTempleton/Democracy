@@ -282,7 +282,7 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
 
     public int getOpinion() {
         BillData bill = BillData.bill;
-        int points = -5;
+        int points = -15;
         for (Ammendment ammendment : desiredAmendments) {
             if (bill.amendments.contains(ammendment)) {
                 points += 10;
