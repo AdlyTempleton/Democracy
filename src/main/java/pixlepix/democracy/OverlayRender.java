@@ -159,6 +159,10 @@ public class OverlayRender {
                         for (Ammendment ammendment : congressman.hatedAmendments) {
                             result.add("Doesn't want: " + ammendment.name);
                         }
+                        if (BillData.bill.porkBarrelCongressmen.contains(congressman)) {
+                            result.add("Pork barrel bonus: 20");
+                        }
+                        result.add("Pork barrel penalty: -" + 2 * BillData.bill.porkBarrelCongressmen.size());
                         result.add("Peer Pressure: " + congressman.getPeerPressure());
                         result.add("Total opinion: " + (congressman.getOpinion() + congressman.getPeerPressure()));
                     }

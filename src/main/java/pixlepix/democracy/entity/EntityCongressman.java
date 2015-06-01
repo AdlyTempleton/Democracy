@@ -55,7 +55,7 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
                 desiredAmendments.add(prop);
             }
         }
-        
+
         for (int i = 0; i < r.nextInt(2); i++) {
             Ammendment amend = Ammendment.potentialAmendments.get(r.nextInt(Ammendment.potentialAmendments.size()));
             if (!desiredAmendments.contains(amend) && !hatedAmendments.contains(amend)) {
@@ -184,16 +184,20 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
                     type = EnumStage.PRESIDENT;
                 }
 
-            } else {
-                if (isSpeaker && item instanceof ItemAmmendment && type.canAmmend) {
-                    Ammendment ammendment = Ammendment.potentialAmendments.get(stack.getItemDamage());
-                    if (!BillData.bill.amendments.contains(ammendment)) {
-                        if (!worldObj.isRemote) {
+            } else if (stack.getItem() == Items.cooked_porkchop && !BillData.bill.porkBarrelCongressmen.contains(this)) {
+                BillData.bill.porkBarrelCongressmen.add(this);
+                if (!worldObj.isRemote) {
+                    player.addChatComponentMessage(new ChatComponentText("Thanks for the pork barrel!"));
+                }
+            } else if (isSpeaker && item instanceof ItemAmmendment && type.canAmmend) {
+                Ammendment ammendment = Ammendment.potentialAmendments.get(stack.getItemDamage());
+                if (!BillData.bill.amendments.contains(ammendment)) {
+                    if (!worldObj.isRemote) {
 
-                            BillData.bill.amendments.add(ammendment);
-                            player.addChatComponentMessage(new ChatComponentText(ammendment.name + " was added to the bill successfully"));
-                        }
+                        BillData.bill.amendments.add(ammendment);
+                        player.addChatComponentMessage(new ChatComponentText(ammendment.name + " was added to the bill successfully"));
                     }
+
                 }
 
             }
@@ -261,17 +265,16 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
                     if (!worldObj.isRemote) {
                         player.addChatComponentMessage(new ChatComponentText("The president signs the bill. You win!"));
                     }
-                } else {
-                    if (!worldObj.isRemote) {
-                        player.addChatComponentMessage(new ChatComponentText("The bill is vetoed. It moves back into the house"));
+                } else if (!worldObj.isRemote) {
+                    player.addChatComponentMessage(new ChatComponentText("The bill is vetoed. It moves back into the house"));
 
-                        BillData.bill.stage = EnumStage.HOUSEPOSTVETO;
-                    }
+                    BillData.bill.stage = EnumStage.HOUSEPOSTVETO;
                 }
             }
 
-
         }
+
+
         return true;
     }
 
@@ -295,8 +298,9 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
             }
         }
         if (bill.porkBarrelCongressmen.contains(this)) {
-            points += 20;
+            points += 22;
         }
+        points -= 2 * bill.porkBarrelCongressmen.size();
         return points;
     }
 
