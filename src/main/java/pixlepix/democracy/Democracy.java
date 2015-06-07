@@ -41,6 +41,7 @@ import pixlepix.democracy.entity.EntityCongressman;
         BillData.init();
         Ammendment.init();
 
+        EntityRegistry.registerGlobalEntityID(EntityCongressman.class, "Congressman", 130, 20, 0xFF0033);
 
         EntityRegistry.registerModEntity(EntityCongressman.class, "Congressman", 130, this, 80, 1, true);
     }

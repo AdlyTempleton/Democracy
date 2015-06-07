@@ -184,6 +184,9 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
                 if (item == Items.redstone) {
                     type = EnumStage.PRESIDENT;
                 }
+                if (item == Items.diamond_sword) {
+                    setDead();
+                }
 
             } else if (stack.getItem() == Items.cooked_porkchop && !BillData.bill.porkBarrelCongressmen.contains(this)) {
                 BillData.bill.porkBarrelCongressmen.add(this);
@@ -344,12 +347,14 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
         if (worldObj.isRemote) {
             if (isVotingYes()) {
                 timer++;
-                if (timer >= 5) {
+                if (timer >= 20) {
                     timer = 0;
-                    worldObj.spawnParticle(EnumParticleTypes.HEART, posX, posY + 2, posZ, 0, 0, 0);
+                    worldObj.spawnParticle(EnumParticleTypes.HEART, posX, posY + 2.5, posZ, 0, 0, 0);
                 }
             } else {
-                worldObj.spawnParticle(EnumParticleTypes.REDSTONE, posX, posY + 2, posZ, 0, 0, 0);
+                if (worldObj.getTotalWorldTime() % 10 == 0) {
+                    worldObj.spawnParticle(EnumParticleTypes.REDSTONE, posX, posY + 2.5, posZ, 0, 0, 0);
+                }
 
             }
         }

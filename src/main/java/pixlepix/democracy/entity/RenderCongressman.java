@@ -58,21 +58,21 @@ public class RenderCongressman extends RenderLiving {
      * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
      */
     protected ResourceLocation getEntityTexture(EntityCongressman congressman) {
-        
+
+
         if(congressman.type == EnumStage.PRESIDENT){
-            VillagerRegistry.getVillagerSkin(0, librarianVillagerTextures);
+            return VillagerRegistry.getVillagerSkin(0, librarianVillagerTextures);
+        }
+        if (congressman.isSpeaker) {
+            return VillagerRegistry.getVillagerSkin(0, priestVillagerTextures);
         }
 
         if(congressman.type == EnumStage.SENATE){
-            VillagerRegistry.getVillagerSkin(0, farmerVillagerTextures);
+            return VillagerRegistry.getVillagerSkin(0, smithVillagerTextures);
         }
 
         if(congressman.type == EnumStage.HOUSE){
-            VillagerRegistry.getVillagerSkin(0, smithVillagerTextures);
-        }
-        
-        if(congressman.isSpeaker){
-            return VillagerRegistry.getVillagerSkin(0, priestVillagerTextures);
+            return VillagerRegistry.getVillagerSkin(0, farmerVillagerTextures);
         }
 
         return VillagerRegistry.getVillagerSkin(0, villagerTextures);
