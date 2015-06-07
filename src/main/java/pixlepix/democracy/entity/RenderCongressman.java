@@ -1,14 +1,15 @@
 package pixlepix.democracy.entity;
 
-import cpw.mods.fml.common.registry.VillagerRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelVillager;
 import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.registry.VillagerRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 import pixlepix.democracy.data.EnumStage;
 
@@ -24,14 +25,13 @@ public class RenderCongressman extends RenderLiving {
     private static final ResourceLocation librarianVillagerTextures = new ResourceLocation("textures/entity/villager/librarian.png");
     private static final ResourceLocation priestVillagerTextures = new ResourceLocation("textures/entity/villager/priest.png");
     private static final ResourceLocation smithVillagerTextures = new ResourceLocation("textures/entity/villager/smith.png");
-    
+    private static final String __OBFID = "CL_00001032";
     /** Model of the Congressman. */
     protected ModelVillager CongressmanModel;
-    private static final String __OBFID = "CL_00001032";
 
     public RenderCongressman()
     {
-        super(new ModelVillager(0.0F), 0.5F);
+        super(Minecraft.getMinecraft().getRenderManager(), new ModelVillager(0.0F), 0.5F);
         this.CongressmanModel = (ModelVillager)this.mainModel;
     }
 
@@ -78,12 +78,6 @@ public class RenderCongressman extends RenderLiving {
         return VillagerRegistry.getVillagerSkin(0, villagerTextures);
 
     }
-
-    protected void renderEquippedItems(EntityCongressman p_77029_1_, float p_77029_2_)
-    {
-        super.renderEquippedItems(p_77029_1_, p_77029_2_);
-    }
-
     /**
      * Allows the render to do any OpenGL state modifications necessary before the model is rendered. Args:
      * entityLiving, partialTickTime

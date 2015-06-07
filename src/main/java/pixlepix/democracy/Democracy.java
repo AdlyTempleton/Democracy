@@ -1,12 +1,14 @@
 package pixlepix.democracy;
 
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.registry.EntityRegistry;
-import cpw.mods.fml.common.registry.GameRegistry;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import pixlepix.democracy.data.Ammendment;
 import pixlepix.democracy.data.BillData;
 import pixlepix.democracy.entity.EntityCongressman;
@@ -39,14 +41,15 @@ import pixlepix.democracy.entity.EntityCongressman;
         BillData.init();
         Ammendment.init();
 
-        EntityRegistry.registerGlobalEntityID(EntityCongressman.class, "Congressman", 0, 20, 0xFF0033);
 
-
-        EntityRegistry.registerModEntity(EntityCongressman.class, "Congressman", 0, this, 80, 1, true);
+        EntityRegistry.registerModEntity(EntityCongressman.class, "Congressman", 130, this, 80, 1, true);
     }
 
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event)
     {
+        Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(itemAmmendment, 0, new ModelResourceLocation("Democracy:Ammendment", "inventory"));
+
     }
+
 }

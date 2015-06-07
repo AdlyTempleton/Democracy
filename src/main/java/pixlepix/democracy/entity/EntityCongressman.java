@@ -1,6 +1,5 @@
 package pixlepix.democracy.entity;
 
-import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
@@ -11,7 +10,9 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import pixlepix.democracy.ItemAmmendment;
 import pixlepix.democracy.data.Ammendment;
 import pixlepix.democracy.data.BillData;
@@ -202,8 +203,8 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
 
             }
         } else if (isSpeaker && (BillData.bill.stage == this.type || ((BillData.bill.stage == EnumStage.HOUSEPOSTVETO) && type == EnumStage.HOUSE) || (BillData.bill.stage == EnumStage.SENATEPOSTVETO && type == EnumStage.SENATE))) {
-            AxisAlignedBB axisAlignedBB = this.boundingBox.copy().expand(100, 100, 100);
-            ArrayList<EntityCongressman> allCongressmen = (ArrayList<EntityCongressman>) worldObj.getEntitiesWithinAABBExcludingEntity(this, axisAlignedBB, new CongressmanSelector(type));
+            AxisAlignedBB axisAlignedBB = AxisAlignedBB.fromBounds(posX - 100, posY - 100, posZ - 100, posX + 100, posY + 100, posZ + 100);
+            ArrayList<EntityCongressman> allCongressmen = (ArrayList<EntityCongressman>) worldObj.getEntitiesWithinAABB(EntityCongressman.class, axisAlignedBB, new CongressmanSelector(type));
             if (type != EnumStage.PRESIDENT) {
                 int yea = 0;
                 int nay = 0;
@@ -310,11 +311,13 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
 
     public int getPeerPressure() {
 
-        AxisAlignedBB axisAlignedBB = this.boundingBox.copy().expand(8, 8, 8);
-        ArrayList<EntityCongressman> allCongressmen = (ArrayList<EntityCongressman>) worldObj.getEntitiesWithinAABBExcludingEntity(this, axisAlignedBB, new CongressmanSelector(type));
+        AxisAlignedBB axisAlignedBB = AxisAlignedBB.fromBounds(posX - 8, posY - 8, posZ - 8, posX + 8, posY + 8, posZ + 8);
+        ArrayList<EntityCongressman> allCongressmen = (ArrayList<EntityCongressman>) worldObj.getEntitiesWithinAABB(EntityCongressman.class, axisAlignedBB, new CongressmanSelector(type));
         double pressure = 0;
         for (EntityCongressman entityCongressman : allCongressmen) {
-            pressure += entityCongressman.getOpinion() / 4;
+            if (entityCongressman != this) {
+                pressure += entityCongressman.getOpinion() / 4;
+            }
         }
         return (int) pressure;
     }
@@ -343,18 +346,12 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
                 timer++;
                 if (timer >= 5) {
                     timer = 0;
-                    worldObj.spawnParticle("heart", posX, posY + 2, posZ, 0, 0, 0);
+                    worldObj.spawnParticle(EnumParticleTypes.HEART, posX, posY + 2, posZ, 0, 0, 0);
                 }
             } else {
-                worldObj.spawnParticle("reddust", posX, posY + 2, posZ, 0, 0, 0);
+                worldObj.spawnParticle(EnumParticleTypes.REDSTONE, posX, posY + 2, posZ, 0, 0, 0);
 
             }
         }
     }
-
-    @Override
-    public ItemStack[] getLastActiveItems() {
-        return new ItemStack[0];
-    }
-
 }

@@ -1,11 +1,9 @@
 package pixlepix.democracy;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
 import pixlepix.democracy.data.Ammendment;
 
 import java.util.List;
@@ -14,7 +12,6 @@ import java.util.List;
  * Created by localmacaccount on 5/25/15.
  */
 public class ItemAmmendment extends Item {
-    IIcon iIcon;
 
     public ItemAmmendment() {
         super();
@@ -24,17 +21,6 @@ public class ItemAmmendment extends Item {
     @Override
     public String getItemStackDisplayName(ItemStack stack) {
         return Ammendment.potentialAmendments.get(stack.getItemDamage()).name;
-    }
-
-    @Override
-    public void registerIcons(IIconRegister reg) {
-        iIcon = reg.registerIcon("book_normal");
-    }
-
-    @Override
-    public IIcon getIconIndex(ItemStack stack) {
-
-        return iIcon;
     }
 
     @Override

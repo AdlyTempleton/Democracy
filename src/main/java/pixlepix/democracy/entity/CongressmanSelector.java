@@ -1,13 +1,12 @@
 package pixlepix.democracy.entity;
 
-import net.minecraft.command.IEntitySelector;
-import net.minecraft.entity.Entity;
+import com.google.common.base.Predicate;
 import pixlepix.democracy.data.EnumStage;
 
 /**
  * Created by localmacaccount on 5/25/15.
  */
-public class CongressmanSelector implements IEntitySelector {
+public class CongressmanSelector implements Predicate {
 
     public EnumStage stage;
 
@@ -17,7 +16,7 @@ public class CongressmanSelector implements IEntitySelector {
     }
 
     @Override
-    public boolean isEntityApplicable(Entity e) {
+    public boolean apply(Object e) {
         return e instanceof EntityCongressman && !((EntityCongressman) e).isSpeaker && ((EntityCongressman) e).type == stage;
     }
 }
