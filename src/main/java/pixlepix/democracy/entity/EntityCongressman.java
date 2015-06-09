@@ -64,7 +64,7 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
             }
         }
 
-        if (r.nextBoolean() && Ammendment.getHatedBy(type).size() > 0) {
+        if (Ammendment.getHatedBy(type).size() > 0) {
             Ammendment prop = Ammendment.getHatedBy(type).get(r.nextInt(Ammendment.getHatedBy(type).size()));
             if (!desiredAmendments.contains(prop) && !hatedAmendments.contains(prop)) {
                 hatedAmendments.add(prop);
