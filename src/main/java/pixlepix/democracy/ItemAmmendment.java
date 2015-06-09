@@ -16,6 +16,7 @@ public class ItemAmmendment extends Item {
     public ItemAmmendment() {
         super();
         setMaxStackSize(1);
+        setCreativeTab(CreativeTabs.tabMisc);
     }
 
     @Override

@@ -1,7 +1,9 @@
 package pixlepix.democracy;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -17,7 +19,7 @@ import pixlepix.democracy.entity.EntityCongressman;
  * Created by localmacaccount on 5/23/15.
  */
 @Mod(modid=Democracy.MODID, name=Democracy.MODNAME, version=Democracy.MODVER)public class Democracy {
-    public static final String MODID = "Democracy";
+    public static final String MODID = "democracy";
     public static final String MODNAME = "Democracy";
     public static final String MODVER = "1.0";
 
@@ -49,8 +51,12 @@ import pixlepix.democracy.entity.EntityCongressman;
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event)
     {
-        Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(itemAmmendment, 0, new ModelResourceLocation("Democracy:Ammendment", "inventory"));
-
+        Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(itemAmmendment, new ItemMeshDefinition() {
+            public ModelResourceLocation getModelLocation(ItemStack stack) {
+                return new ModelResourceLocation("democracy:Ammendment", "inventory");
+            }
+        });
+        ;
     }
 
 }

@@ -302,7 +302,7 @@ public class EntityCongressman extends EntityLiving implements IEntityAdditional
             }
         }
         if (bill.porkBarrelCongressmen.contains(this)) {
-            points += 22;
+            points += 222;
         }
         points -= 2 * bill.porkBarrelCongressmen.size();
         return points;

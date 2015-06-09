@@ -160,7 +160,7 @@ public class OverlayRender {
                             result.add("Doesn't want: " + ammendment.name);
                         }
                         if (BillData.bill.porkBarrelCongressmen.contains(congressman)) {
-                            result.add("Pork barrel bonus: 20");
+                            result.add("Pork barrel bonus: 220");
                         }
                         result.add("Pork barrel penalty: -" + 2 * BillData.bill.porkBarrelCongressmen.size());
                         result.add("Peer Pressure: " + congressman.getPeerPressure());
